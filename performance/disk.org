@@ -1,0 +1,46 @@
+#+author: Zvonko Kaiser
+#+title: Disk Performance
+#+date: \today
+
+
+#+name Sequential READ speed with big blocks
+#+begin_src shell :dir /mnt/test :results output
+  fio --name TEST --eta-newline=5s --filename=fio-tempfile.dat \
+      --rw=read --Size=500m --io_size=10g --blocksize=1024k --ioengine=libaio \
+      --fsync=10000 --iodepth=32 --direct=1 --numjobs=1 --runtime=60 \
+      --group_reporting --loops=3
+#+end_src
+
+#+RESULTS:
+#+begin_example
+TEST: (g=0): rw=read, bs=(R) 1024KiB-1024KiB, (W) 1024KiB-1024KiB, (T) 1024KiB-1024KiB, ioengine=libaio, iodepth=32
+fio-3.28
+Starting 1 process
+
+TEST: (groupid=0, jobs=1): err= 0: pid=165353: Tue Feb 15 19:26:20 2022
+  read: IOPS=2379, BW=2379MiB/s (2495MB/s)(10.3GiB/4413msec)
+    slat (usec): min=13, max=168, avg=21.72, stdev=12.43
+    clat (usec): min=1062, max=28423, avg=13380.91, stdev=3361.89
+     lat (usec): min=1086, max=28442, avg=13402.69, stdev=3362.89
+    clat percentiles (usec):
+     |  1.00th=[ 3916],  5.00th=[ 9896], 10.00th=[10814], 20.00th=[10945],
+     | 30.00th=[11207], 40.00th=[11731], 50.00th=[12780], 60.00th=[13829],
+     | 70.00th=[14615], 80.00th=[15795], 90.00th=[17957], 95.00th=[20055],
+     | 99.00th=[21890], 99.50th=[22676], 99.90th=[25297], 99.95th=[26870],
+     | 99.99th=[27919]
+   bw (  MiB/s): min= 2300, max= 2426, per=99.84%, avg=2375.50, stdev=38.64, samples=8
+   iops        : min= 2300, max= 2426, avg=2375.50, stdev=38.64, samples=8
+  lat (msec)   : 2=0.38%, 4=0.74%, 10=3.96%, 20=89.79%, 50=5.12%
+  cpu          : usr=0.23%, sys=5.85%, ctx=10383, majf=0, minf=8203
+  IO depths    : 1=0.2%, 2=0.4%, 4=0.8%, 8=1.6%, 16=3.2%, 32=93.8%, >=64=0.0%
+     submit    : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, >=64=0.0%
+     complete  : 0=0.0%, 4=99.8%, 8=0.0%, 16=0.0%, 32=0.2%, 64=0.0%, >=64=0.0%
+     issued rwts: total=10500,0,0,0 short=0,0,0,0 dropped=0,0,0,0
+     latency   : target=0, window=0, percentile=100.00%, depth=32
+
+Run status group 0 (all jobs):
+   READ: bw=2379MiB/s (2495MB/s), 2379MiB/s-2379MiB/s (2495MB/s-2495MB/s), io=10.3GiB (11.0GB), run=4413-4413msec
+
+Disk stats (read/write):
+  nvme1n1: ios=31363/0, merge=0/0, ticks=407166/0, in_queue=407166, util=98.07%
+#+end_example
